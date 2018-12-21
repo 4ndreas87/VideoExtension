@@ -2,7 +2,7 @@
 	"name": "WatchSeries Video Skipper",
 	"version": "0.1",
 	"description": "waits for the end of an episode on watchseries, does everything required to get to the next video when turned on.",
-	"permissions": ["declarativeContent", "storage"],
+	"permissions": ["activeTab", "declarativeContent", "storage"],
 	"background": {
  		"scripts": ["background.js"],
  		"persistent": false
