@@ -9,6 +9,9 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 chrome.browserAction.onClicked.addListener(function() {
-  chrome.tabs.create({'url': "https://www.youtube.com/watch?reload=9&v=1vDZsABHUbQ"
-    });
+	// closes current tab (I hope!)
+    chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
+    	var tabID = t[0].id
+    	chrome.tabs.remove(tabID)
+	});
 });

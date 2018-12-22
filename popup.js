@@ -4,8 +4,11 @@
 
 'use strict';
 
-let changeColor = document.getElementById('changeColor');
+let startService = document.getElementById('startService');
 
-changeColor.onclick = function(element) {
-    chrome.tabs.create({ 'url': "https://www.youtube.com/watch?reload=9&v=1vDZsABHUbQ" });
-  };
+startService.onclick = function(element) {
+    //document.getElementById('myVideo').addEventListener('ended', myHandler, false);
+    chrome.tabs.query({ active: true }, function(tab) {
+        chrome.tabs.remove(tab[0].id);
+	});
+};
