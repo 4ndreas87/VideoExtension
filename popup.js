@@ -6,16 +6,35 @@
 
 let startService = document.getElementById('startService');
 
-startService.onclick = function(element) {
-	// this and every other version of finding the video element always return undefined, so I can never add a listener to them
-	// I have no idea if the video ended thing even works because I've never been able to get the video HTML element
-    document.getElementsByTagName("video")[0].addEventListener('ended',myHandler,false);
-	// I think adds a listener for the end of the video?
-    function myHandler(e) {
-    	// Closes current tab. This part works for sure, but nothing else does. 
-        chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
-    		var tabID = t[0].id
-    		chrome.tabs.remove(tabID)
-		});
-    };
+
+function closeTab(activeTabID) {
+    // Closes current tab. This part works for sure, but nothing else does.
+    chrome.tabs.remove(ActiveTabID);
 };
+
+function addVidEndListener() {
+	chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
+		// gets the current tab's integer ID
+    	var tabID = t[0].id;
+    	// WHaTEVER YOU DO< DON"T USE DOCUMENT FOR SEARCHING THROUHG HTML because it'll only search the html of the 
+    	// popup and background
+    	// this is kinda a nonsense line
+    	// injects the 'code' string into the js of the page I think.
+    	// code string should get the first video element in the page, add a listener for it ending,
+    	// and, when it ends, close the tab.
+		chrome.tabs.executeScript(tabID, {code: 
+			"var test = document.getElementsByTagName('video')[0]; \
+			console.log(test) \
+			test.addEventListener('ended', function() {return true})"},
+			function(a) {
+				// apparently the results of 'code' are returned in an array
+				if(a[0] == true){
+					closeTab(tabID)
+				}
+			}
+		);
+	});
+};
+
+startService.addEventListener("click", addVidEndListener)
+
