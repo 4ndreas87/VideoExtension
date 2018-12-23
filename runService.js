@@ -1,6 +1,6 @@
 
 
-var vidElement = $("video")[0];
+var vidElement = $("video");
 document.vidElement.addEventListener('ended',myHandler,false);
 	// I think adds a listener for the end of the video?
 function myHandler() {

@@ -7,5 +7,16 @@
 let startService = document.getElementById('startService');
 
 startService.onclick = function(element) {
-	file: 'runService.js'
+	var vidElement = $("video")[0];
+	// this and every other version of finding the video element always return undefined, so I can never add a listener to them
+	// I have no idea if the video ended thing even works because I've never been able to get the video HTML element
+    document.vidElement.addEventListener('ended',myHandler,false);
+	// I think adds a listener for the end of the video?
+    function myHandler(e) {
+    	// Closes current tab. This part works for sure, but nothing else does. 
+        chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
+    		var tabID = t[0].id
+    		chrome.tabs.remove(tabID)
+		});
+    };
 };

@@ -8,14 +8,24 @@ chrome.runtime.onInstalled.addListener(function() {
 	return;
 });
 
+// This is just for when I want the action to be done when you click the extension, rather than the popup.
+// to change back and forth, delete '"default_popup": "popup.js"' from the browser action of the manifest.
+
+
 chrome.browserAction.onClicked.addListener(function() {
-	/*document.getElementsByTagName('video')[0].addEventListener('ended',myHandler,false);
+	// Here is where the checking to see if there is a video somethwere would go.
+	// maybe there's some nonsense workaround I can do.
+	//var vidElement = $('video')[0];
+	//console.log(vidElement);
+    //document.vidElement.addEventListener('ended',myHandler,false);
 	// I think adds a listener for the end of the video?
-    function myHandler(e) {
+
     	// Closes current tab
         chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
     		var tabID = t[0].id
     		chrome.tabs.remove(tabID)
 		});
-    }*/
-});
+		var nextButton = document.querySelectorAll(".npbutton button-next")[0];
+		nextButton.click();
+    });
+
