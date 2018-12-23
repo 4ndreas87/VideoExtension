@@ -9,9 +9,13 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 chrome.browserAction.onClicked.addListener(function() {
-	// closes current tab (I hope!)
-    chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
-    	var tabID = t[0].id
-    	chrome.tabs.remove(tabID)
-	});
+	/*document.getElementsByTagName('video')[0].addEventListener('ended',myHandler,false);
+	// I think adds a listener for the end of the video?
+    function myHandler(e) {
+    	// Closes current tab
+        chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
+    		var tabID = t[0].id
+    		chrome.tabs.remove(tabID)
+		});
+    }*/
 });
