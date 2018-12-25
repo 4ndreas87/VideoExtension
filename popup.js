@@ -23,16 +23,8 @@ function addVidEndListener() {
     	// code string should get the first video element in the page, add a listener for it ending,
     	// and, when it ends, close the tab.
 		chrome.tabs.executeScript(tabID, {code: 
-			"var test = document.getElementsByTagName('video')[0]; \
-			console.log(test) \
-			test.addEventListener('ended', function() {return true})"},
-			function(a) {
-				// apparently the results of 'code' are returned in an array
-				if(a[0] == true){
-					closeTab(tabID)
-				}
-			}
-		);
+			"var vid = document.getElementsByTagName('video')[0]; \
+			vid.addEventListener('ended', chrome.runtime.sendMessage('enjjhfignlnigepmpnfipcpjhcdmghek', true, function(){;}))"})	
 	});
 };
 

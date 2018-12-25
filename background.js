@@ -12,14 +12,29 @@ chrome.runtime.onInstalled.addListener(function() {
 // to change back and forth, delete '"default_popup": "popup.js"' from the browser action of the manifest.
 
 
-chrome.browserAction.onClicked.addListener(function() {
-	// Here is where the checking to see if there is a video somethwere would go.
-	// maybe there's some nonsense workaround I can do.
-	//var vidElement = $('video')[0];
-	//console.log(vidElement);
-    //document.vidElement.addEventListener('ended',myHandler,false);
-	// I think adds a listener for the end of the video?
+function closeTab(ID) {
+    // Closes current tab. This part works for sure, but nothing else does.
+    chrome.tabs.remove(ID);
+};
 
+function actOnVidEnd(ID) {
+	chrome.runtime.onMessage.addListener(function(message, sender, func){
+		if (message == true) {
+			console.log("ASDFASDFADSFGSDFGSFGHSERTA$EWTRHWSGH")
+		}
+	});
+} 
+
+// hopefully this works?
+chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
+	// gets the current tab's integer ID
+   	var tabID = t[0].id;
+   	actOnVidEnd(tabID);
+});
+
+
+
+/*
     	// Closes current tab
         chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
     		var tabID = t[0].id
@@ -29,3 +44,4 @@ chrome.browserAction.onClicked.addListener(function() {
 		nextButton.click();
     });
 
+*/
