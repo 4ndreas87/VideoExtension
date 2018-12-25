@@ -24,7 +24,8 @@ function addVidEndListener() {
 
 function actOnVidEnd() {
 	// when the extension recieves the message that the video has ended (just true in this case)
-	// (might need to be changed later to confirm sender), It does func on the inputted tab.
+	// (might need to be changed later to confirm sender), closes the current (streamplay) tab
+	// hopefully later it will open the next video
 	chrome.runtime.onMessage.addListener(function(message, sender, func){
 		if (message == true) {
 			// clicks all the links through until it gets to the next episode.
@@ -32,6 +33,8 @@ function actOnVidEnd() {
 				// gets the current tab's integer ID, closes it
    				var tabID = t[0].id;
    				closeTab(tabID);
+   				// so for some reason adding another tab query here breaks the first one.
+   				// hm. there's a chance that it just doesn't like runnint something on a new tab after it's closed it?
    			});
 		};
 	});
