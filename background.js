@@ -11,7 +11,7 @@ chrome.runtime.onInstalled.addListener(function() {
 // This is just for when I want the action to be done when you click the extension, rather than the popup.
 // to change back and forth, delete '"default_popup": "popup.js"' from the browser action of the manifest.
 
-
+/*
 function closeTab(ID) {
     // Closes current tab. This part works for sure, but nothing else does.
     chrome.tabs.remove(ID);
@@ -32,7 +32,7 @@ chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
    	actOnVidEnd(tabID);
 });
 
-
+*/
 
 /*
     	// Closes current tab
