@@ -1,9 +1,5 @@
 let startService = document.getElementById('startService');
 
-function closeTab(activeTabID) {
-    chrome.tabs.remove(activeTabID);
-};
-
 function addVidEndListener() {
 	chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
 		// gets the current tab's integer ID
@@ -29,12 +25,18 @@ function actOnVidEnd() {
 	chrome.runtime.onMessage.addListener(function(message, sender, func){
 		if (message == true) {
 			// clicks all the links through until it gets to the next episode.
-			chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
+			// sometimes there are problems with just closing the tab.
+			chrome.tabs.query({'active': true, 'currentWindow': true}, function(a) {
 				// gets the current tab's integer ID, closes it
-   				var tabID = t[0].id;
-   				closeTab(tabID);
-   				// so for some reason adding another tab query here breaks the first one.
-   				// hm. there's a chance that it just doesn't like runnint something on a new tab after it's closed it?
+   				var tabID1 = a[0].id;
+   				// IMPORTANT ********* IMPORTANT ************* IMPORTANT ********** IMPORTANT
+   				// The reason it wouldn't work is because this is in the popup file. 
+   				// it seems like it stops working when the popup closes
+   				// which is why it wouldn't close on video end.
+   				// putting all this into background should hopefully fix it
+   				// it may also fix the putting functions together.
+   				// IMPORTANT ********* IMPORTANT ************* IMPORTANT ********** IMPORTANT
+   				chrome.tabs.remove(tabID1, function(){});
    			});
 		};
 	});

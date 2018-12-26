@@ -1,47 +1,49 @@
-// Copyright 2018 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
+// not sure if necessary
 'use strict';
 
+// not sure if necessary
 chrome.runtime.onInstalled.addListener(function() {
 	return;
 });
 
-// This is just for when I want the action to be done when you click the extension, rather than the popup.
-// to change back and forth, delete '"default_popup": "popup.js"' from the browser action of the manifest.
 
-/*
-function closeTab(ID) {
-    // Closes current tab. This part works for sure, but nothing else does.
-    chrome.tabs.remove(ID);
+function addVidEndListener() {
+	chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
+		// gets the current tab's integer ID
+    	var tabID = t[0].id;
+    	// inserts this code into the js of the current active tab
+    	// the code gets the first video element running on the page, and adds a listener it.
+    	// when the video ends it sends a message, bool true, back to the extension 
+    	// (no need for extension ID because it isn't cross extension communication)
+		chrome.tabs.executeScript(tabID, {code:
+			"var vid = document.getElementsByTagName('video')[0]; \
+			vid.onended = function() { \
+				chrome.runtime.sendMessage(true); \
+			};"
+		});
+	});
 };
 
-function actOnVidEnd(ID) {
+
+function actOnVidEnd() {
+	// when the extension recieves the message that the video has ended (just true in this case)
+	// (might need to be changed later to confirm sender), closes the current (streamplay) tab
+	// hopefully later it will open the next video
 	chrome.runtime.onMessage.addListener(function(message, sender, func){
 		if (message == true) {
-			console.log("ASDFASDFADSFGSDFGSFGHSERTA$EWTRHWSGH")
-		}
+			// clicks all the links through until it gets to the next episode.
+			chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
+				// gets the current tab's integer ID, closes it
+   				var tabID = t[0].id;
+   				chrome.tabs.remove(tabID);
+   			});
+		};
 	});
-} 
+};
 
-// hopefully this works?
-chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
-	// gets the current tab's integer ID
-   	var tabID = t[0].id;
-   	actOnVidEnd(tabID);
-});
 
-*/
 
-/*
-    	// Closes current tab
-        chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
-    		var tabID = t[0].id
-    		chrome.tabs.remove(tabID)
-		});
-		var nextButton = document.querySelectorAll(".npbutton button-next")[0];
-		nextButton.click();
-    });
 
-*/
+chrome.browserAction.onClicked.addListener(addVidEndListener);
+
+actOnVidEnd();
