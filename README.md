@@ -1,0 +1,1 @@
+A chrome extension that works with [watchseries](https://www1.swatchseries.to) to detect when an episode being watched has ended, and autoplay the next episode
