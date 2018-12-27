@@ -36,13 +36,21 @@ function actOnVidEnd() {
 				// gets the current tab's integer ID, closes it
    				var tabID = t[0].id;
    				chrome.tabs.remove(tabID);
+   				chrome.tabs.query({'url': '*://*.swatchseries.to/episode*'}, function(a) {
+   					// gets the watchseries tab's integer ID, clicks next episode and streamplay link
+   					// eventually change to whatever video domain you want.
+   					// put that in the options at some point
+   					var tabID1 = a[0].id;
+   					console.log(tabID1);
+   					chrome.tabs.executeScript(tabID1, {code:
+   						"var nextButton = document.getElementsByClassName('npbutton button-next')[0]; \
+   						nextButton.click();"
+   					});
+   				});
    			});
 		};
 	});
 };
-
-
-
 
 chrome.browserAction.onClicked.addListener(addVidEndListener);
 
