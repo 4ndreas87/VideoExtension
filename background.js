@@ -18,7 +18,7 @@ function addVidEndListener() {
 		chrome.tabs.executeScript(tabID, {code:
 			"var vid = document.getElementsByTagName('video')[0]; \
 			vid.onended = function() { \
-				chrome.runtime.sendMessage(true); \
+				chrome.runtime.sendMessage('test sequence for message 4443211'); \
 			};"
 		});
 	});
@@ -30,7 +30,7 @@ function actOnVidEnd() {
 	// (might need to be changed later to confirm sender), closes the current (streamplay) tab
 	// hopefully later it will open the next video
 	chrome.runtime.onMessage.addListener(function(message, sender, func){
-		if (message == true) {
+		if (message == 'test sequence for message 4443211') {
 			// clicks all the links through until it gets to the next episode.
 			chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
 				// gets the current tab's integer ID, closes it
@@ -41,11 +41,26 @@ function actOnVidEnd() {
    					// eventually change to whatever video domain you want.
    					// put that in the options at some point
    					var tabID1 = a[0].id;
-   					console.log(tabID1);
    					chrome.tabs.executeScript(tabID1, {code:
    						"var nextButton = document.getElementsByClassName('npbutton button-next')[0]; \
    						nextButton.click();"
    					});
+
+   					// when the tb is ub=padated to the new episode screen, clicks the link to 
+   					// the first streamplay domain option.
+   					var domainSelectTabUpdated = false;
+   					chrome.tabs.onUpdated.addListener(function(tID, infoChange, b){
+   						if (domainSelectTabUpdated == false) {
+   							chrome.tabs.executeScript(tID, {code:
+   								// here is where we'd change the option to choose a different domain.
+   								"var watchButton = document.querySelectorAll(\"[title = 'streamplay.to']\")[0]; \
+   								watchButton.click();"
+   							});
+   							domainSelectTabUpdated = true;
+   						};
+   					});
+
+   					//here's my question, how do I identify the thisrd tab? is it always freecale?
    				});
    			});
 		};
