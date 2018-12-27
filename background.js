@@ -32,35 +32,52 @@ function actOnVidEnd() {
 	chrome.runtime.onMessage.addListener(function(message, sender, func){
 		if (message == 'test sequence for message 4443211') {
 			// clicks all the links through until it gets to the next episode.
-			chrome.tabs.query({'active': true, 'currentWindow': true}, function(t) {
+			chrome.tabs.query({'active': true, 'currentWindow': true}, function(watchTab) {
 				// gets the current tab's integer ID, closes it
-   				var tabID = t[0].id;
-   				chrome.tabs.remove(tabID);
-   				chrome.tabs.query({'url': '*://*.swatchseries.to/episode*'}, function(a) {
+   				var watchTabID = watchTab[0].id;
+   				chrome.tabs.remove(watchTabID);
+
+   				chrome.tabs.query({'url': '*://*.swatchseries.to/episode*'}, function(lastEpTab) {
    					// gets the watchseries tab's integer ID, clicks next episode and streamplay link
    					// eventually change to whatever video domain you want.
    					// put that in the options at some point
-   					var tabID1 = a[0].id;
-   					chrome.tabs.executeScript(tabID1, {code:
+   					var lastEpTabID = lastEpTab[0].id;
+   					chrome.tabs.executeScript(lastEpTabID, {code:
    						"var nextButton = document.getElementsByClassName('npbutton button-next')[0]; \
    						nextButton.click();"
    					});
 
-   					// when the tb is ub=padated to the new episode screen, clicks the link to 
+   					// when the tab is upadated to the new episode screen, clicks the link to 
    					// the first streamplay domain option.
    					var domainSelectTabUpdated = false;
-   					chrome.tabs.onUpdated.addListener(function(tID, infoChange, b){
+   					chrome.tabs.onUpdated.addListener(function(domainSelectTabID, infoChange, domainSelectTab){
    						if (domainSelectTabUpdated == false) {
-   							chrome.tabs.executeScript(tID, {code:
+   							chrome.tabs.executeScript(domainSelectTabID, {code:
    								// here is where we'd change the option to choose a different domain.
-   								"var watchButton = document.querySelectorAll(\"[title = 'streamplay.to']\")[0]; \
-   								watchButton.click();"
+   								"var domainSelectButton = document.querySelectorAll(\"[title = 'streamplay.to']\")[0]; \
+   								domainSelectButton.click();"
    							});
    							domainSelectTabUpdated = true;
    						};
    					});
 
-   					//here's my question, how do I identify the thisrd tab? is it always freecale?
+   					// here's my question, how do I identify the thisrd tab? is it always freecale?
+   					// It looks like it is but we'll have to see if I'm allowed to do that in the url field.
+   					// (Hopefully), gets the tab ID of the "click here to play" tab, and clicks here
+   					// to play.
+   					// so the problem here is that it's either checking for the new tab too fast and not getting it
+   					// or it''s matching for the wrong url
+   					// who fuckin knows
+   					
+   					setTimeout(function(test){500+200;}, 1000);
+
+   					chrome.tabs.query({'url': ['*://*.swatchseries.to/freecale']}, function(newWatchTab) {
+   						var newWatchTabID = newWatchTab[0].id;
+   						chrome.tabs.executeScript(newWatchTabID, {code:
+   							"var clickToWatch = document.getElementsByClassName('push_button blue')[0]; \
+   							clickToWatch.click();"
+   						});
+   					});
    				});
    			});
 		};
