@@ -25,6 +25,24 @@ function addVidEndListener() {
 };
 
 
+
+function startVideoRestartService(vidTabID) {
+  // given an int for the vid tab ID, clicks through to pla the video, then restarts the extension.
+  // to be run after the captcha has been clicked in a streamplay thing.
+  chrome.tabs.executeScript(vidTabID, {code: 
+      'var proceedButton = document.getElementByID(btn_download); \
+      proceedButton.click();'}
+  );
+  chrome.tabs.onUpdated.addListener(function(vidTabID, infoChange, vidTab) {
+    // we'll see about th coding practices of using vidTabID as another parameter inside this function.
+    chrome.tabs.executeScript(vidTabID, {code: 
+      'var playerPoster = document.getElementsByClassName("player-poster clickable")[0]; \
+      playerPoster.click();'}, actOnVidEnd);
+    // not sure if act on vid end necessarily needs to be a callback, but we'll see.
+  });
+};
+
+
 function actOnVidEnd() {
 	// when the extension recieves the message that the video has ended (just true in this case)
 	// (might need to be changed later to confirm sender), closes the current (streamplay) tab
@@ -33,6 +51,10 @@ function actOnVidEnd() {
   /* so Here's why this is so long and so nestedly indented.
   Kip can't figure out how to take these snippets out into being their own functions
   because they all need to run after/as callbacks for the first one.
+  the real truth is that I'm just not great at thinking with asynchronicity.
+
+  Buh. huh.
+
   there might be a way to write them to run whatever callback I write to them
   like 'closeWatchTab(callback = 
           clickNextEp(callback = 
@@ -43,7 +65,9 @@ function actOnVidEnd() {
 	chrome.runtime.onMessage.addListener(function(message, sender, func){
 		if (message == 'test sequence for message 4443211') {
 			// clicks all the links through until it gets to the next episode.
-			chrome.tabs.query({'active': true, 'currentWindow': true}, function(watchTab) {
+
+      //change domain option here too.
+			chrome.tabs.query({'url': '*://streamplay.me/*'}, function(watchTab) {
 				// gets the current tab's integer ID, closes it
  				var watchTabID = watchTab[0].id;
  				chrome.tabs.remove(watchTabID);
@@ -55,14 +79,15 @@ function actOnVidEnd() {
           var lastEpTabID = lastEpTab[0].id;
           chrome.tabs.executeScript(lastEpTabID, {code:
             "var nextButton = document.getElementsByClassName('npbutton button-next')[0]; \
-            nextButton.click();"
-          });
+            nextButton.click();"}
+          );
 
           // when the tab is upadated to the new episode screen, clicks the link to 
           // the first streamplay domain option.
           var domainSelectTabUpdated = false;
           chrome.tabs.onUpdated.addListener(function(domainSelectTabID, infoChange, domainSelectTab){
             if (domainSelectTabUpdated == false) {
+              domainSelectTabUpdated = true;
               chrome.tabs.executeScript(domainSelectTabID, 
 
                 {code:
@@ -80,21 +105,61 @@ function actOnVidEnd() {
                     // to play.
                     var newWatchTabID = newWatchTab[0].id;
                     // gets last tab with a watchseries url, which should be the click to play page
-                    chrome.tabs.executeScript(newWatchTabID, 
-
-                      {code:
+                    chrome.tabs.executeScript(newWatchTabID, {code:
                         "var clickToWatch = document.getElementsByClassName('push_button blue')[0]; \
-                        clickToWatch.click();"},
+                        clickToWatch.click();"
+                    });
 
                       // run this function after clicking the click here to play button.
-                      function(test1){
-                        11 + 5;
-                      });
-                  });
-                });
-              // here so that it only clicks the domain link once, rather than every time the tab is updated.
-              domainSelectTabUpdated = true;
+                      // this whole function has to be catered which domain option.
+                      // currently it just runs streamplay.
+                      // might need a chrome tabs onupdate.
+                    var watchNextEpTabUpdated = false;
+                    chrome.tabs.onUpdated.addListener(function(newEpTabID, infoChange, newEpTab){
+                      if (watchNextEpTabUpdated == false){
+                        watchNextEpTabUpdated = true;
 
+                        // it's looking through the page before the captcha loads, so we're gonna delay it by just a little bit.
+                        // we're not sure whehter 5 whole seconds is necessary but I'm leaving it until it produces a noticable lag.
+                        // it seems like the time part should come first rather than the function that's going after it.
+
+                        // once it loads, detect whether there is a captcha and send that back to the extension.
+                        setTimeout(function(){
+                          chrome.tabs.executeScript(newEpTabID,
+                            {code:
+                              'var captcha = document.getElementsByClassName("g-recaptcha"); \
+                              if (captcha.length != 0) { \
+                                console.log("there is one"); \
+                                chrome.runtime.sendMessage("there is a captcha"); \
+                              } else { \
+                                console.log("there isn\'t one"); \
+                                chrome.runtime.sendMessage("there is not a captcha"); \
+                              }'
+                            }); console.log("this is first");
+                          }, 5000);
+                        
+                        // listen for a message as to whether there is a captcha or not.
+                        chrome.runtime.onMessage.addListener(function(message1, sender1, func1){
+                          if (message1 == "there is a captcha"){
+                            // break captcha, call start video restart service
+                            console.log("yup");
+                          } else if (message1 == "there is not a captcha") {
+                            console.log("nope");
+                            //startVideoRestartService();
+                          }
+                        });
+                      };
+                      /*
+
+                        //run this function after checking for a captcha
+                        function(test2){
+                          
+                        }
+                      );*/
+                    });
+                  });
+                }
+              );              
             };
           });
  				});
@@ -102,6 +167,10 @@ function actOnVidEnd() {
     };
 	});
 };
+
+
+// there's also some kind of nonsense about where the semicolons should go?
+// that's for later though.
 
 chrome.browserAction.onClicked.addListener(addVidEndListener);
 
